@@ -1,6 +1,5 @@
 import fugashi
-import jaconv
-import mojimoji
+import habachen
 import unicodedata
 import re
 import pathlib
@@ -65,9 +64,9 @@ def normalize_text(text):
     # perform unicode normalization
     text = unicodedata.normalize('NFKC', text)
     # convert all full-width alphanum to half-width, since it can go out as-is
-    text = mojimoji.zen_to_han(text, kana=False)
+    text = habachen.zen_to_han(text, kana=False)
     # replace half-width katakana with full-width
-    text = mojimoji.han_to_zen(text, digit=False, ascii=False)
+    text = habachen.han_to_zen(text, digit=False, ascii=False)
     return text
 
 def load_exceptions():
@@ -318,7 +317,7 @@ class Cutlet:
             # Check character type using the values defined in char.def.
             # This is constant across unidic versions so far but not guaranteed.
             if word.char_type in (CHAR_HIRAGANA, CHAR_KATAKANA):
-                kana = jaconv.kata2hira(word.surface)
+                kana = habachen.to_hiragana(word.surface)
                 return self.map_kana(kana)
 
             # At this point this is an unknown word and not kana. Could be
@@ -348,7 +347,7 @@ class Cutlet:
             return word.feature.lemma.split('-')[-1]
         elif word.feature.kana:
             # for known words
-            kana = jaconv.kata2hira(word.feature.kana)
+            kana = habachen.to_hiragana(word.feature.kana)
             return self.map_kana(kana)
         else:
             # unclear when we would actually get here
